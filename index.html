@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Football Champion 2026</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:#000}
+  body{font-family:Arial, sans-serif}
+
+  /* ===== ECRAN DEMARRAGE PAYSAGE ===== */
+  #splashScreen{
+    position:absolute;inset:0;
+    background:linear-gradient(90deg,#0a4fb8,#083b8f);
+    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    color:#fff;z-index:100
+  }
+  #gameTitle{
+    font-size:4vw;font-weight:900;text-align:center;
+    letter-spacing:.1vw;text-shadow:0 0 8px rgba(255,255,255,.2);
+    margin-bottom:4vh;white-space:nowrap
+  }
+  #startBtn{
+    width:25vw;height:7vh;background:#fff;color:#083b8f;
+    border:none;border-radius:1.5vh;font-size:2.5vw;font-weight:bold;
+    display:flex;align-items:center;justify-content:center
+  }
+  #startBtn:active{transform:scale(.96)}
+
+  /* ===== ECRAN LANGUE ===== */
+  #langScreen{
+    position:absolute;inset:0;
+    background:linear-gradient(90deg,#0a4fb8,#083b8f);
+    display:none;flex-direction:column;justify-content:center;align-items:center;
+    color:#fff;gap:2vh;padding:3vh 5vw
+  }
+  #langScreen h1{font-size:3vw;text-align:center;margin-bottom:1vh}
+.langBtn{
+    width:30vw;height:7vh;background:#fff;color:#083b8f;
+    border:none;border-radius:1.5vh;font-size:2.2vw;font-weight:bold
+  }
+.langBtn:active{transform:scale(.96)}
+
+  /* ===== ECRAN PSEUDO ===== */
+  #pseudoScreen{
+    position:absolute;inset:0;
+    background:linear-gradient(90deg,#0a4fb8,#083b8f);
+    display:none;flex-direction:column;justify-content:center;align-items:center;
+    color:#fff;gap:2vh;padding:3vh 5vw
+  }
+  #pseudoScreen h2{font-size:3vw;text-align:center}
+  #aiSuggest{
+    font-size:1.8vw;color:#ffeb3b;text-align:center;min-height:3vh
+  }
+  #pseudoInput{
+    width:40vw;height:7vh;font-size:2.5vw;text-align:center;
+    border:none;border-radius:1.5vh;padding:0 2vw
+  }
+  #okBtn{
+    width:20vw;height:7vh;background:#fff;color:#083b8f;
+    border:none;border-radius:1.5vh;font-size:2.2vw;font-weight:bold
+  }
+  #okBtn:active{transform:scale(.96)}
+
+  /* ===== MENU PRINCIPAL PAYSAGE AVEC VINI FULL ===== */
+  #menuScreen{
+    position:absolute;inset:0;
+    display:none;
+    background:#0a4fb8
+  }
+
+  /* VINI EN FOND PLEIN ECRAN */
+  #heroPlayer{
+    position:absolute;inset:0;
+    width:100%;height:100%;object-fit:cover;
+    z-index:1
+  }
+
+  /* DEGRADÉ PAR-DESSUS POUR LIRE LE PSEUDO */
+  #menuScreen::after{
+    content:'';
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(8,59,143,.7) 0%,rgba(8,59,143,.2) 40%,rgba(0,0,0,.8) 100%);
+    z-index:2
+  }
+
+  /* PSEUDO EN HAUT A GAUCHE */
+  #playerPseudo{
+    position:absolute;top:3vh;left:3vw;z-index:3;
+    color:#fff;font-size:3vw;font-weight:bold;
+    text-shadow:0 2px 8px rgba(0,0,0,.8)
+  }
+
+  /* BARRE COMPETITIONS EN BAS - ICONES GROSSES */
+.competBar{
+    position:absolute;bottom:0;left:0;right:0;height:22vh;z-index:3;
+    background:linear-gradient(to top,rgba(0,0,0,.95),rgba(0,0,0,.2));
+    overflow-x:auto;overflow-y:hidden;white-space:nowrap;
+    -webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;
+    padding:2vh 2vw;display:flex;align-items:center;gap:2vw
+  }
+.competBar::-webkit-scrollbar{display:none}
+.comp{
+    flex:0 0 auto;width:12vw;scroll-snap-align:center
+  }
+.icon{
+    width:11vh;height:11vh;margin:auto;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent;transition:transform.1s
+  }
+.icon:active{transform:scale(.85)}
+.icon img{max-width:100%;max-height:100%;object-fit:contain}
+
+  /* ===== ECRAN MATCH RAPIDE - SELECTION LIGUE ===== */
+  #leagueScreen{
+    position:absolute;inset:0;
+    background:linear-gradient(90deg,#0a4fb8,#083b8f);
+    display:none;flex-direction:column;z-index:50
+  }
+  #leagueHeader{
+    width:100%;height:12vh;display:flex;align-items:center;
+    padding:0 3vw;background:rgba(0,0,0,.3)
+  }
+  #backBtn{
+    width:8vh;height:8vh;background:#fff;color:#083b8f;
+    border:none;border-radius:50%;font-size:3vw;font-weight:bold;
+    display:flex;align-items:center;justify-content:center
+  }
+  #backBtn:active{transform:scale(.9)}
+  #leagueTitle{
+    flex:1;text-align:center;color:#fff;font-size:2.8vw;font-weight:bold
+  }
+  #leagueGrid{
+    flex:1;padding:3vh 2vw;display:grid;
+    grid-template-columns:repeat(3,1fr);gap:2vh;
+    overflow-y:auto;align-content:start
+  }
+.leagueCard{
+    background:rgba(255,255,255,.1);border-radius:2vh;
+    display:flex;flex-direction:column;align-items:center;
+    justify-content:center;padding:1.5vh;gap:1vh;
+    border:2px solid rgba(255,255,255,.2);min-height:18vh
+  }
+.leagueCard:active{transform:scale(.95);background:rgba(255,255,255,.2)}
+.leagueIcon{width:10vh;height:10vh;display:flex;align-items:center;justify-content:center}
+.leagueIcon img{max-width:100%;max-height:100%;object-fit:contain}
+.leagueName{color:#fff;font-size:1.6vw;font-weight:bold;text-align:center;line-height:1.1}
+
+  /* ===== ECRAN SELECTION EQUIPE ===== */
+  #teamScreen{
+    position:absolute;inset:0;
+    background:linear-gradient(90deg,#0a4fb8,#083b8f);
+    display:none;flex-direction:column;z-index:60
+  }
+  #teamHeader{
+    width:100%;height:12vh;display:flex;align-items:center;
+    padding:0 3vw;background:rgba(0,0,0,.3)
+  }
+  #backTeamBtn{
+    width:8vh;height:8vh;background:#fff;color:#083b8f;
+    border:none;border-radius:50%;font-size:3vw;font-weight:bold;
+    display:flex;align-items:center;justify-content:center
+  }
+  #backTeamBtn:active{transform:scale(.9)}
+  #teamTitle{
+    flex:1;text-align:center;color:#fff;font-size:2.5vw;font-weight:bold
+  }
+  #teamGrid{
+    flex:1;padding:3vh 2vw;display:grid;
+    grid-template-columns:repeat(4,1fr);gap:2vh;
+    overflow-y:auto;align-content:start
+  }
+.teamCard{
+    background:rgba(255,255,255,.1);border-radius:2vh;
+    display:flex;flex-direction:column;align-items:center;
+    justify-content:center;padding:1.5vh;gap:1vh;
+    border:2px solid rgba(255,255,255,.2);min-height:20vh
+  }
+.teamCard:active{transform:scale(.95);background:rgba(255,255,255,.2)}
+.teamCard.selected{border:3px solid #ffeb3b;background:rgba(255,235,59,.2)}
+.teamIcon{width:12vh;height:12vh;display:flex;align-items:center;justify-content:center}
+.teamIcon img{max-width:100%;max-height:100%;object-fit:contain}
+.teamName{color:#fff;font-size:1.4vw;font-weight:bold;text-align:center;line-height:1.1}
+</style>
+</head>
+<body>
+
+<!-- ===== ECRAN 0 : DEMARRAGE ===== -->
+<div id="splashScreen">
+  <div id="gameTitle">FOOTBALL CHAMPION 2026</div>
+  <button id="startBtn" onclick="goToLang()">START</button>
+</div>
+
+<!-- ===== ECRAN 1 : CHOIX LANGUE ===== -->
+<div id="langScreen">
+  <h1 id="title">CHOISISSEZ VOTRE LANGUE</h1>
+  <button class="langBtn" onclick="setLang('fr')">FRANÇAIS</button>
+  <button class="langBtn" onclick="setLang('en')">ENGLISH</button>
+  <button class="langBtn" onclick="setLang('es')">ESPAÑOL</button>
+  <button class="langBtn" onclick="setLang('pt')">PORTUGUÊS</button>
+  <button class="langBtn" onclick="setLang('de')">DEUTSCH</button>
+</div>
+
+<!-- ===== ECRAN 2 : PSEUDO AVEC IA ===== -->
+<div id="pseudoScreen">
+  <h2 id="pseudoTitle">ENTREZ VOTRE PSEUDO</h2>
+  <div id="aiSuggest"></div>
+  <input id="pseudoInput" type="text" maxlength="12" placeholder="Pseudo">
+  <button id="okBtn" onclick="savePseudo()">OK</button>
+</div>
+
+<!-- ===== ECRAN 3 : MENU VINI FULL SCREEN ===== -->
+<div id="menuScreen">
+  <img id="heroPlayer" src="hero_vini.png" alt="Player">
+  <div id="playerPseudo"></div>
+  <div class="competBar" id="competBar"></div>
+</div>
+
+<!-- ===== ECRAN 4 : MATCH RAPIDE - SELECTION LIGUE ===== -->
+<div id="leagueScreen">
+  <div id="leagueHeader">
+    <button id="backBtn" onclick="backToMenu()">←</button>
+    <div id="leagueTitle">CHOISISSEZ UN CHAMPIONNAT</div>
+  </div>
+  <div id="leagueGrid"></div>
+</div>
+
+<!-- ===== ECRAN 5 : SELECTION EQUIPE ===== -->
+<div id="teamScreen">
+  <div id="teamHeader">
+    <button id="backTeamBtn" onclick="backToLeague()">←</button>
+    <div id="teamTitle">CHOISISSEZ VOTRE ÉQUIPE</div>
+  </div>
+  <div id="teamGrid"></div>
+</div>
+
+<script>
+  let currentLang = 'fr';
+  let playerName = '';
+  let selectedLeague = '';
+  let selectedTeam1 = '';
+  let selectedTeam2 = '';
+
+  const T = {
+    fr:{title:"CHOISISSEZ VOTRE LANGUE",pseudo:"ENTREZ VOTRE PSEUDO",aiSuggest:"Suggestion IA : ",league:"CHOISISSEZ UN CHAMPIONNAT",team:"CHOISISSEZ VOTRE ÉQUIPE",team2:"CHOISISSEZ L'ADVERSAIRE",match:"MATCH : "},
+    en:{title:"CHOOSE YOUR LANGUAGE",pseudo:"ENTER YOUR NICKNAME",aiSuggest:"AI Suggestion: ",league:"CHOOSE A LEAGUE",team:"CHOOSE YOUR TEAM",team2:"CHOOSE OPPONENT",match:"MATCH: "},
+    es:{title:"ELIGE TU IDIOMA",pseudo:"INGRESA TU APODO",aiSuggest:"Sugerencia IA: ",league:"ELIGE UNA LIGA",team:"ELIGE TU EQUIPO",team2:"ELIGE RIVAL",match:"PARTIDO: "},
+    pt:{title:"ESCOLHA SEU IDIOMA",pseudo:"DIGITE SEU APELIDO",aiSuggest:"Sugestão IA: ",league:"ESCOLHA UMA LIGA",team:"ESCOLHA SUA EQUIPE",team2:"ESCOLHA ADVERSÁRIO",match:"JOGO: "},
+    de:{title:"WÄHLE DEINE SPRACHE",pseudo:"GIB DEINEN SPITZNAMEN EIN",aiSuggest:"KI-Vorschlag: ",league:"WÄHLE EINE LIGA",team:"WÄHLE DEIN TEAM",team2:"WÄHLE GEGNER",match:"SPIEL: "}
+  };
+
+  const aiNames = {
+    fr:["LeKing","ViniJr","ButRapide","CoachPro","ElCapo"],
+    en:["TheKing","ViniJr","GoalMachine","ProCoach","TheBoss"],
+    es:["ElRey","ViniJr","GolRapido","Entrenador","ElJefe"],
+    pt:["ORei","ViniJr","GolRapido","Treinador","OChefe"],
+    de:["DerKönig","ViniJr","Torjäger","Trainer","DerChef"]
+  };
+
+  const TEAMS = {
+    "Premier League":[
+      {name:"Arsenal", file:"arsenal.png"},
+      {name:"Aston Villa", file:"astonvilla.png"},
+      {name:"Bournemouth", file:"bournemouth.png"},
+      {name:"Brentford", file:"brentford.png"},
+      {name:"Brighton", file:"brighton.png"},
+      {name:"Burnley", file:"burnley.png"},
+      {name:"Chelsea", file:"chelsea.png"},
+      {name:"Crystal Palace", file:"crystalpalace.png"},
+      {name:"Everton", file:"everton.png"},
+      {name:"Fulham", file:"fulham.png"},
+      {name:"Leeds United", file:"leeds.png"},
+      {name:"Liverpool", file:"liverpool.png"},
+      {name:"Manchester City", file:"mancity.png"},
+      {name:"Manchester United", file:"manutd.png"},
+      {name:"Newcastle", file:"newcastle.png"},
+      {name:"Nottingham Forest", file:"nottingham.png"},
+      {name:"Sunderland", file:"sunderland.png"},
+      {name:"Tottenham Hotspur", file:"tottenham.png"},
+      {name:"West Ham", file:"westham.png"},
+      {name:"Wolves", file:"wolves.png"}
+    ]
+  };
+
+  const CLUBS = {
+    "Manchester United": `
+    <div class="club manutd">
+    <h2>Manchester United - Old Trafford - Capitaine: Bruno Fernandes</h2>
+
+    <h3>Gardiens</h3>
+    <ul class="player-list">
+    <li><span class="num">1.</span> Altay Bayındır</li>
+    <li><span class="num">22.</span> Tom Heaton</li>
+    <li><span class="num">31.</span> Senne Lammens</li>
+    </ul>
+
+    <h3>Défenseurs</h3>
+    <ul class="player-list">
+    <li><span class="num">2.</span> Diogo Dalot</li>
+    <li><span class="num">3.</span> Noussair Mazraoui</li>
+    <li><span class="num">4.</span> Matthijs de Ligt</li>
+    <li><span class="num">5.</span> Harry Maguire</li>
+    <li><span class="num">6.</span> Lisandro Martínez</li>
+    <li><span class="num">12.</span> Tyrell Malacia</li>
+    <li><span class="num">13.</span> Patrick Dorgu</li>
+    <li><span class="num">15.</span> Leny Yoro</li>
+    <li><span class="num">23.</span> Luke Shaw</li>
+    <li><span class="num">26.</span> Ayden Heaven</li>
+    </ul>
+
+    <h3>Milieux</h3>
+    <ul class="player-list">
+    <li><span class="num">7.</span> Mason Mount</li>
+    <li><span class="num">8.</span> Bruno Fernandes - Capitaine</li>
+    <li><span class="num">18.</span> Casemiro</li>
+    <li><span class="num">25.</span> Manuel Ugarte</li>
+    <li><span class="num">37.</span> Kobbie Mainoo</li>
+    </ul>
+
+    <h3>Attaquants</h3>
+    <ul class="player-list">
+    <li><span class="num">10.</span> Matheus Cunha</li>
+    <li><span class="num">11.</span> Joshua Zirkzee</li>
+    <li><span class="num">16.</span> Amad Diallo</li>
+    <li><span class="num">19.</span> Bryan Mbeumo</li>
+    <li><span class="num">30.</span> Benjamin Šeško</li>
+    <li><span class="num">32.</span> Chido Obi</li>
+    </ul>
+
+    <div class="coach">Coach : Michael Carrick</div>
+    </div>
+    `
+  };
+
+  function goToLang(){
+    document.getElementById('splashScreen').style.display='none';
+    document.getElementById('langScreen').style.display='flex';
+  }
+
+  function setLang(l){
+    currentLang = l;
+    document.getElementById('title').innerText = T[l].title;
+    document.getElementById('pseudoTitle').innerText = T[l].pseudo;
+    document.getElementById('leagueTitle').innerText = T[l].league;
+    document.getElementById('teamTitle').innerText = T[l].team;
+    const suggestion = aiNames[l][Math.floor(Math.random()*aiNames[l].length)];
+    document.getElementById('aiSuggest').innerText = T[l].aiSuggest + suggestion;
+    document.getElementById('pseudoInput').value = suggestion;
+    document.getElementById('langScreen').style.display='none';
+    document.getElementById('pseudoScreen').style.display='flex';
+  }
+
+  function savePseudo(){
+    const p = document.getElementById('pseudoInput').value.trim();
+    if(!p) return alert(currentLang=='fr'?'Entre un pseudo':'Enter a nickname');
+    playerName = p;
+    showMenu(p);
+  }
+
+  function showMenu(p){
+    document.getElementById('pseudoScreen').style.display='none';
+    document.getElementById('leagueScreen').style.display='none';
+    document.getElementById('teamScreen').style.display='none';
+    document.getElementById('menuScreen').style.display='block';
+    document.getElementById('playerPseudo').innerText = p;
+
+    const bar = document.getElementById('competBar');
+    const items = [
+      {name:"Match Rapide", file:"match_rapide_white.png"},
+      {name:"Champions League", file:"ucl.png"},
+      {name:"Europa League", file:"uel.png"},
+      {name:"Europa Conference", file:"uecl.png"},
+      {name:"Coupe du Monde Clubs", file:"clubwc.png"},
+      {name:"Coupe du Monde FIFA", file:"fifawc.png"},
+      {name:"CAN", file:"can.png"},
+      {name:"Copa America", file:"copaamerica.png"},
+      {name:"Euro", file:"euro.png"},
+      {name:"Ligue des Nations", file:"nationsleague.png"},
+      {name:"Gold Cup", file:"goldcup.png"},
+      {name:"Coupe d'Asie AFC", file:"afc.png"},
+      {name:"LDC Africaine", file:"cafcl.png"},
+      {name:"Copa Libertadores", file:"libertadores.png"},
+      {name:"Copa Sudamericana", file:"sudamericana.png"},
+      {name:"Championnat", file:"championnat.png"},
+      {name:"Entraînement", file:"entrainement.png"},
+      {name:"Extra", file:"extra.png"}
+    ];
+
+    bar.innerHTML = '';
+    items.forEach(it=>{
+      bar.innerHTML += `<div class="comp" onclick="selectMode('${it.name}')">
+        <div class="icon"><img src="${it.file}" alt="${it.name}" onerror="this.style.opacity=.2"></div>
+      </div>`;
+    });
+  }
+
+  function selectMode(mode){
+    if(mode === 'Match Rapide'){
+      showLeagueSelection();
+    } else {
+      alert('Mode : '+mode+'\n\nProchaine étape : écran terrain');
+    }
+  }
+
+  function showLeagueSelection(){
+    document.getElementById('menuScreen').style.display='none';
+    document.getElementById('teamScreen').style.display='none';
+    document.getElementById('leagueScreen').style.display='flex';
+
+    const grid = document.getElementById('leagueGrid');
+    const leagues = [
+      {name:"Premier League", file:"premierleague.png"},
+      {name:"LaLiga", file:"laliga.png"},
+      {name:"Serie A", file:"seriea.png"},
+      {name:"Bundesliga", file:"bundesliga.png"},
+      {name:"Ligue 1", file:"ligue1.png"},
+      {name:"Eredivisie", file:"eredivisie.png"},
+      {name:"Liga Portugal", file:"ligaportugal.png"},
+      {name:"Scottish Premiership", file:"scotland.png"},
+      {name:"Jupiler Pro League", file:"jupiler.png"},
+      {name:"Süper Lig", file:"superlig.png"},
+      {name:"Swiss Super League", file:"swiss.png"},
+      {name:"Austrian Bundesliga", file:"austria.png"},
+      {name:"MLS", file:"mls.png"},
+      {name:"Saudi Pro League", file:"saudileague.png"},
+      {name:"Russian PL", file:"russia.png"},
+      {name:"Ukrainian PL", file:"ukraine.png"},
+      {name:"Super League Grèce", file:"greece.png"},
+      {name:"Ekstraklasa", file:"ekstraklasa.png"},
+      {name:"HNL Croatie", file:"hnl.png"},
+      {name:"3F Superliga", file:"denmark.png"}
+    ];
+
+    grid.innerHTML = '';
+    leagues.forEach(lg=>{
+      grid.innerHTML += `
+        <div class="leagueCard" onclick="selectLeague('${lg.name}')">
+          <div class="leagueIcon">
+            <img src="${lg.file}" alt="${lg.name}"
+            onerror="this.parentNode.innerHTML='<div style=color:#fff;font-size:4vh;font-weight:bold>'+'${lg.name.substring(0,3).toUpperCase()}'+'</div>'">
+          </div>
+          <div class="leagueName">${lg.name}</div>
+        </div>`;
+    });
+  }
+
+  function backToMenu(){
+    document.getElementById('leagueScreen').style.display='none';
+    document.getElementById('menuScreen').style.display='block';
+  }
+
+  function selectLeague(league){
+    selectedLeague = league;
+    selectedTeam1 = '';
+    selectedTeam2 = '';
+    document.getElementById('leagueScreen').style.display='none';
+    showTeamSelection(league);
+  }
+
+  function showTeamSelection(league){
+    document.getElementById('teamScreen').style.display='flex';
+    document.getElementById('teamTitle').innerText =!selectedTeam1? T[currentLang].team : T[currentLang].team2;
+    const grid = document.getElementById('teamGrid');
+    const teams = TEAMS[league] || [];
+    grid.innerHTML = '';
+    if(teams.length === 0){
+      grid.innerHTML = `<div style="color:#fff;font-size:2vw;text-align:center;grid-column:1/-1;margin-top:10vh">Aucune équipe disponible pour cette ligue</div>`;
+      return;
+    }
+    teams.forEach(tm=>{
+      const isSelected = tm.name === selectedTeam1;
+      grid.innerHTML += `
+        <div class="teamCard ${isSelected?'selected':''}" onclick="selectTeam('${tm.name}')">
+          <div class="teamIcon">
+            <img src="${tm.file}" alt="${tm.name}"
+            onerror="this.parentNode.innerHTML='<div style=color:#fff;font-size:3vh;font-weight:bold>'+'${tm.name.substring(0,3).toUpperCase()}'+'</div>'">
+          </div>
+          <div class="teamName">${tm.name}</div>
+        </div>`;
+    });
+  }
+
+  function backToLeague(){
+    if(selectedTeam1 &&!selectedTeam2){
+      selectedTeam1 = '';
+      document.getElementById('teamTitle').innerText = T[currentLang].team;
+      showTeamSelection(selectedLeague);
+    } else {
+      document.getElementById('teamScreen').style.display='none';
+      document.getElementById('leagueScreen').style.display='flex';
+    }
+  }
+
+  function selectTeam(teamName){
+    if(!selectedTeam1){
+      selectedTeam1 = teamName;
+      showTeamSelection(selectedLeague);
+    } else {
+      selectedTeam2 = teamName;
+      alert(T[currentLang].match + selectedTeam1 + ' vs ' + selectedTeam2 + '\n\nProchaine étape : écran terrain');
+    }
+  }
+</script>
+</body>
+</html>
